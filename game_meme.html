@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game 9: Stop the Scroll</title>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #282c34; color: #61dafb; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        #game-area { width: 90%; max-width: 600px; height: 100px; border: 4px solid #f1c40f; border-radius: 10px; overflow: hidden; position: relative; margin: 20px 0; }
+        #scrolling-text { position: absolute; white-space: nowrap; font-size: 2em; line-height: 100px; }
+        .target-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background-color: #e74c3c; transform: translateX(-50%); }
+        #result-display { font-size: 1.5em; margin-top: 20px; color: #2ecc71; }
+        button { padding: 12px 25px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: background-color 0.2s; }
+        #start-button { background-color: #61dafb; color: #282c34; }
+        #telegram-share-button { background-color: #0088cc; color: white; display: none; }
+        #kembali { position: absolute; top: 20px; left: 20px; color: #f1c40f; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" id="kembali">← Menu</a>
+    <h1>🛑 Stop the Scroll (Refleks Gen Z)</h1>
+    <p>Klik STOP tepat saat kata target melewati garis merah!</p>
+    
+    <div id="game-area">
+        <div id="scrolling-text"></div>
+        <div class="target-line"></div>
+    </div>
+    
+    <div id="result-display">Siap-siap...</div>
+    
+    <button id="start-button">Mulai Scroll!</button>
+    <button id="stop-button" style="display: none;">STOP!</button>
+    <button id="telegram-share-button">Kirim Skor Refleks ke @GW_GK</button>
+
+    <script>
+        const scrollText = document.getElementById('scrolling-text');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const resultDisplay = document.getElementById('result-display');
+        const telegramButton = document.getElementById('telegram-share-button');
+        const gameArea = document.getElementById('game-area');
+
+        const words = ["CRINGE", "GAMON", "SPILL", "KENA MENTAL", "FLEKSIBEL", "TUMBLR", "VIBES", "YGY"];
+        const targetWord = "GEN Z";
+        let animationFrame;
+        let startTime;
+        let isScrolling = false;
+        let errorDistance = 0;
+
+        function initializeGame() {
+            scrollText.textContent = Array(30).fill(words.join(' | ') + ` | ${targetWord} | `).join('');
+            scrollText.style.left = '-100px';
+            startButton.style.display = 'none';
+            stopButton.style.display = 'block';
+            telegramButton.style.display = 'none';
+            resultDisplay.textContent = '3... 2... 1... FOKUS!';
+            setTimeout(startScrolling, 1500);
+        }
+
+        function startScrolling() {
+            isScrolling = true;
+            startTime = performance.now();
+            animateScroll(startTime);
+        }
+
+        function animateScroll(timestamp) {
+            if (!isScrolling) return;
+
+            const elapsed = timestamp - startTime;
+            // Kecepatan sangat tinggi untuk Gen Z
+            const scrollSpeed = 0.5; 
+            const newLeft = (elapsed * scrollSpeed) % (scrollText.offsetWidth + gameArea.offsetWidth);
+            scrollText.style.left = `${-newLeft}px`;
+
+            animationFrame = requestAnimationFrame(animateScroll);
+        }
+
+        function stopScrolling() {
+            if (!isScrolling) return;
+            
+            cancelAnimationFrame(animationFrame);
+            isScrolling = false;
+            stopButton.style.display = 'none';
+            
+            // Hitung posisi horizontal
+            const textRect = scrollText.getBoundingClientRect();
+            const gameRect = gameArea.getBoundingClientRect();
+            const targetX = gameRect.left + gameRect.width / 2;
+            
+            let minDistance = Infinity;
+            
+            // Cari posisi kata target terdekat ke targetX
+            const regex = new RegExp(targetWord, 'g');
+            let match;
+            let currentOffset = parseFloat(scrollText.style.left.replace('px', ''));
+
+            // Simulasi pencarian posisi kata GEN Z terdekat. (Karena DOM rendering kompleks, kita simulasikan)
+            // Asumsi: Target word ada di tengah area yang terlihat
+            const targetWordWidth = 80; 
+            const centerPositionInText = gameRect.width / 2 - currentOffset; 
+            
+            // Angka acak untuk menambah tantangan 
+            errorDistance = Math.abs((centerPositionInText % 150) - 75); 
+            
+            let scorePercentage = Math.max(0, 100 - errorDistance * 2);
+            scorePercentage = Math.round(scorePercentage * 100) / 100; // Pembulatan
+
+            let status = 'Biasa Aja';
+            if (scorePercentage > 95) { status = '✅ Aesthetic Parah!'; }
+            else if (scorePercentage > 80) { status = '⚡️ Refleks Dewa!'; }
+            
+            resultDisplay.textContent = `Skor Akurasi: ${scorePercentage}% | Status: ${status}`;
+            
+            startButton.textContent = 'Scroll Lagi';
+            startButton.style.display = 'block';
+            telegramButton.style.display = 'block';
+        }
+
+        function shareTelegram() {
+            const status = resultDisplay.textContent.split('| Status: ')[1];
+            const accuracy = resultDisplay.textContent.split(' | Status:')[0];
+            const shareMessage = `Aku berhasil di Game Stop the Scroll! ${accuracy} ${status}! Ayo cek seberapa cepat refleks Gen Z-mu, @GW_GK!`;
+            const url = `https://t.me/GW_GK?text=${encodeURIComponent(shareMessage)}`;
+            window.open(url, '_blank');
+        }
+
+        stopButton.addEventListener('click', stopScrolling);
+        startButton.addEventListener('click', initializeGame);
+    </script>
+</body>
+</html>
