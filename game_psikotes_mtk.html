@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game 15: Psikotes MTK Dasar Simulasi</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Tema biru-hijau untuk MTK */
+            background: linear-gradient(135deg, #164a41 0%, #306060 50%, #468888 100%); 
+            color: #ecf0f1;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+        }
+        #game-container {
+            background-color: rgba(30, 60, 60, 0.95);
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h1 { color: #a9f0d1; margin-bottom: 5px; } /* Hijau Muda */
+        #instruction { color: #bdc3c7; margin-bottom: 30px; font-style: italic; }
+
+        .question-card {
+            background-color: #3e5a5a;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            text-align: left;
+            border-left: 5px solid #a9f0d1;
+        }
+        .question-card h3 { color: #a9f0d1; margin-top: 0; font-weight: 600; }
+        .options label {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .options label:hover {
+            background-color: #4e7a7a;
+        }
+        .options input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: #ffda79; /* Kuning Pudar */
+        }
+        
+        #submit-button {
+            padding: 15px 30px;
+            background-color: #3870a2; /* Biru Solid */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        #submit-button:hover { background-color: #2b6090; }
+        
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        #result h2 { color: white; margin-top: 0; }
+        #score-display { font-size: 2.5em; font-weight: 700; color: #a9f0d1; margin-bottom: 15px; }
+
+        #telegram-share-button {
+            background-color: #0088cc; color: white; padding: 10px 20px;
+            border-radius: 5px; text-decoration: none; border: none;
+            margin-top: 15px; cursor: pointer; font-weight: bold;
+        }
+        #kembali {
+            position: absolute; top: 20px; left: 20px;
+            color: #a9f0d1; text-decoration: none; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" id="kembali">← Menu</a>
+
+    <div id="game-container">
+        <h1>🔢 15: Psikotes MTK Dasar (Akurasi & Kecepatan)</h1>
+        <p id="instruction">Uji kemampuan berhitung dasar, deret angka, dan logika numerik Anda (Total 8 Soal).</p>
+
+        <form id="quiz-form">
+            
+            <div class="question-card" data-correct="B">
+                <h3>1. Operasi Dasar</h3>
+                <p>Hasil dari <strong>345 + 189</strong> adalah:</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="A"> <span>A. 524</span></label>
+                    <label><input type="radio" name="q1" value="B"> <span>B. 534</span></label>
+                    <label><input type="radio" name="q1" value="C"> <span>C. 434</span></label>
+                    <label><input type="radio" name="q1" value="D"> <span>D. 424</span></label>
+                </div>
+            </div>
+
+            <div class="question-card" data-correct="A">
+                <h3>2. Operasi Dasar</h3>
+                <p>Berapakah <strong>712 - 45</strong>?</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="A"> <span>A. 667</span></label>
+                    <label><input type="radio" name="q2" value="B"> <span>B. 677</span></label>
+                    <label><input type="radio" name="q2" value="C"> <span>C. 767</span></label>
+                    <label><input type="radio" name="q2" value="D"> <span>D. 777</span></label>
+                </div>
+            </div>
+
+            <div class="question-card" data-correct="D">
+                <h3>3. Operasi Dasar</h3>
+                <p>Nilai dari <strong>14 x 13</strong> adalah:</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="A"> <span>A. 152</span></label>
+                    <label><input type="radio" name="q3" value="B"> <span>B. 164</span></label>
+                    <label><input type="radio" name="q3" value="C"> <span>C. 172</span></label>
+                    <label><input type="radio" name="q3" value="D"> <span>D. 182</span></label>
+                </div>
+            </div>
+
+            <div class="question-card" data-correct="C">
+                <h3>4. Operasi Dasar</h3>
+                <p>Hasil dari <strong>225 : 5</strong> adalah:</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="A"> <span>A. 35</span></label>
+                    <label><input type="radio" name="q4" value="B"> <span>B. 40</span></label>
+                    <label><input type="radio" name="q4" value="C"> <span>C. 45</span></label>
+                    <label><input type="radio" name="q4" value="D"> <span>D. 50</span></label>
+                </div>
+            </div>
+
+            <div class="question-card" data-correct="B">
+                <h3>5. Deret Angka</h3>
+                <p>Lanjutkan pola angka: <strong>1, 4, 9, 16, 25, ...</strong></p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="A"> <span>A. 30</span></label>
+                    <label><input type="radio" name="q5" value="B"> <span>B. 36</span></label>
+                    <label><input type="radio" name="q5" value="C"> <span>C. 49</span></label>
+                    <label><input type="radio" name="q5" value="D"> <span>D. 64</span></label>
+                </div>
+            </div>
+
+            <div class="question-card" data-correct="D">
+                <h3>6. Persentase</h3>
+                <p>Berapakah <strong>20% dari 450</strong>?</p>
+                <div class="options">
+                    <label><input type="radio" name="q6" value="A"> <span>A. 45</span></label>
+                    <label><input type="radio" name="q6" value="B"> <span>B. 80</span></label>
+                    <label><input type="radio" name="q6" value="C"> <span>C. 85</span></label>
+                    <label><input type="radio" name="q6" value="D"> <span>D. 90</span></label>
+                </div>
+            </div>
+            
+            <div class="question-card" data-correct="A">
+                <h3>7. Soal Cerita: Waktu</h3>
+                <p>Sebuah mobil menempuh jarak 120 km dalam waktu 2 jam. Berapa kecepatan rata-rata mobil tersebut (km/jam)?</p>
+                <div class="options">
+                    <label><input type="radio" name="q7" value="A"> <span>A. 60 km/jam</span></label>
+                    <label><input type="radio" name="q7" value="B"> <span>B. 80 km/jam</span></label>
+                    <label><input type="radio" name="q7" value="C"> <span>C. 100 km/jam</span></label>
+                    <label><input type="radio" name="q7" value="D"> <span>D. 120 km/jam</span></label>
+                </div>
+            </div>
+
+            <div class="question-card" data-correct="C">
+                <h3>8. Soal Cerita: Proporsi</h3>
+                <p>Jika 3 liter bensin cukup untuk menempuh jarak 45 km, berapa liter bensin yang dibutuhkan untuk menempuh jarak 150 km?</p>
+                <div class="options">
+                    <label><input type="radio" name="q8" value="A"> <span>A. 8 liter</span></label>
+                    <label><input type="radio" name="q8" value="B"> <span>B. 9 liter</span></label>
+                    <label><input type="radio" name="q8" value="C"> <span>C. 10 liter</span></label>
+                    <label><input type="radio" name="q8" value="D"> <span>D. 12 liter</span></label>
+                </div>
+            </div>
+
+            <button type="submit" id="submit-button">SELESAI & HITUNG SKOR</button>
+        </form>
+
+        <div id="result">
+            <h2>Hasil Simulasi Psikotes MTK Anda</h2>
+            <div id="score-display"></div>
+            <p id="feedback"></p>
+            <button id="telegram-share-button">Pamer Skor MTK ke @GW_GK</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const questions = document.querySelectorAll('.question-card');
+            let score = 0;
+            const totalQuestions = questions.length;
+
+            questions.forEach(q => {
+                const correct = q.getAttribute('data-correct');
+                const name = q.querySelector('input[type="radio"]').name;
+                const selected = document.querySelector(`input[name="${name}"]:checked`);
+                
+                // Cek jawaban
+                if (selected && selected.value === correct) {
+                    score++;
+                }
+            });
+
+            // Tampilkan Hasil
+            const resultDiv = document.getElementById('result');
+            const scoreDisplay = document.getElementById('score-display');
+            const feedbackText = document.getElementById('feedback');
+            
+            let message = '';
+            
+            // Logika Umpan Balik Berdasarkan Skor
+            if (score === totalQuestions) {
+                message = "Anda Cepat dan Akurat! Skor Sempurna menunjukkan kemampuan numerik yang sangat kuat.";
+                resultDiv.style.backgroundColor = '#2ecc71'; // Hijau (Sempurna)
+            } else if (score >= 6) {
+                message = "Hebat! Kecepatan dan akurasi berhitung Anda di atas rata-rata. Pertahankan!";
+                resultDiv.style.backgroundColor = '#f39c12'; // Oranye (Baik)
+            } else if (score >= 4) {
+                 message = "Hasil Cukup Baik. Fokus pada pemahaman soal cerita dan deret angka untuk meningkatkan skor.";
+                resultDiv.style.backgroundColor = '#e67e22'; // Oranye tua
+            } else {
+                message = "Perlu Latihan Intensif! Asah lagi dasar-dasar operasi hitung Anda agar lebih cepat.";
+                resultDiv.style.backgroundColor = '#c0392b'; // Merah (Perlu Latihan)
+            }
+
+            scoreDisplay.textContent = `${score} / ${totalQuestions}`;
+            feedbackText.textContent = message;
+            resultDiv.style.display = 'block';
+            document.getElementById('submit-button').style.display = 'none';
+            
+            // Scroll ke hasil
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('telegram-share-button').addEventListener('click', function() {
+            const score = document.getElementById('score-display').textContent;
+            const message = `Aku mendapat skor ${score} di Simulasi Psikotes MTK Dasar! Aku merasa tertantang di bagian hitungan cepat. Coba kamu, @GW_GK!`;
+            const url = `https://t.me/GW_GK?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        });
+    </script>
+</body>
+</html>
