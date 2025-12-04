@@ -2,45 +2,139 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>AI Ganti Background</title>
+  <title>AI Ganti Background – Enhanced</title>
+
   <style>
-    body { font-family: Arial; padding: 20px; }
-    button { padding: 10px 16px; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f1f1f1;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 450px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    h2 { text-align: center; }
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #004ecc; }
+
+    #result { width: 100%; border-radius: 10px; margin-top: 15px; display:none; }
+
+    .spinner {
+      display: none;
+      margin: 15px auto;
+      border: 4px solid #ddd;
+      border-top: 4px solid #0066ff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-<h2>AI Hapus Background & Ganti Warna</h2>
+<div class="card">
 
-<input type="file" id="imageInput" accept="image/*"><br>
-<select id="colorSelect">
-  <option value="red">Merah</option>
-  <option value="blue">Biru</option>
-</select><br>
+<h2>AI Pasfoto Maker</h2>
 
-<button onclick="edit()">Proses dengan AI</button>
+<label>Unggah Foto</label>
+<input type="file" id="imageInput" accept="image/*">
 
-<h3>Hasil:</h3>
-<img id="result" style="max-width:300px">
+<label>Pilih Background</label>
+<select id="bgSelect">
+  <option value="red">Merah Formal</option>
+  <option value="blue">Biru Formal</option>
+  <option value="gradient1">Gradient Biru</option>
+  <option value="gradient2">Gradient Merah</option>
+  <option value="studio1">Studio Soft Light</option>
+  <option value="studio2">Studio Grey</option>
+</select>
+
+<label>Ukuran Pasfoto</label>
+<select id="sizeSelect">
+  <option value="4x6">4 x 6 cm</option>
+  <option value="3x4">3 x 4 cm</option>
+</select>
+
+<label>Enhancement (AI)</label>
+<select id="enhanceSelect">
+  <option value="none">Matikan</option>
+  <option value="smooth">Smoothing Wajah</option>
+  <option value="bright">Brightness Auto</option>
+  <option value="sharp">Sharpening</option>
+  <option value="all">Semua (Rekomendasi)</option>
+</select>
+
+<button onclick="edit()">Proses Dengan AI</button>
+
+<div class="spinner" id="spinner"></div>
+
+<h3 style="margin-top:15px">Hasil:</h3>
+<img id="result">
+
+</div>
 
 <script>
 async function edit() {
-  const file = document.getElementById("imageInput").files[0];
-  const color = document.getElementById("colorSelect").value;
+  const file = imageInput.files[0];
+  if (!file) return alert("Unggah foto dulu!");
+
+  const spinner = document.getElementById("spinner");
+  const result = document.getElementById("result");
+  result.style.display = "none";
+  spinner.style.display = "block";
 
   const form = new FormData();
   form.append("image", file);
-  form.append("color", color);
+  form.append("background", bgSelect.value);
+  form.append("size", sizeSelect.value);
+  form.append("enhance", enhanceSelect.value);
 
-  const workerURL = "https://gk.stevdev69.workers.dev";
+  const workerURL = "https://gk.stevdev69.workers.dev"; // GANTI DENGAN PUNYAMU
 
-  const response = await fetch(workerURL, {
-    method: "POST",
-    body: form
-  });
+  try {
+    const response = await fetch(workerURL, { method: "POST", body: form });
+    const blob = await response.blob();
 
-  const blob = await response.blob();
-  document.getElementById("result").src = URL.createObjectURL(blob);
+    result.src = URL.createObjectURL(blob);
+    result.style.display = "block";
+
+  } catch (err) {
+    alert("Gagal memproses: " + err);
+  }
+
+  spinner.style.display = "none";
 }
 </script>
 
