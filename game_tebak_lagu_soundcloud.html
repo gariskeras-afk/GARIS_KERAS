@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Tebak Lagu Hits YouTube 🎶</title>
+    <title>Kuis Tebak Lagu Hits SoundCloud 🎧</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
         
@@ -37,9 +37,9 @@
             border-radius: 8px;
             border-left: 5px solid #ff6b6b;
         }
-        #youtube-player-container {
+        #soundcloud-player-container {
             width: 100%;
-            aspect-ratio: 16 / 9; 
+            height: 100px; /* Cukup untuk player SoundCloud minimal */
             margin-bottom: 20px;
             display: none; 
             border-radius: 8px;
@@ -83,11 +83,11 @@
 </head>
 <body>
     <div id="quiz-box">
-        <h1>🎧 Kuis Tebak Lagu Viral 2020-2025 🎧</h1>
-        <p>Tebak lagu hits dari klip video YouTube tersembunyi!</p>
+        <h1>🎧 Kuis Tebak Lagu Viral (SoundCloud) 🎧</h1>
+        <p>Tebak lagu hits dari klip SoundCloud!</p>
         
-        <div id="youtube-player-container">
-            <div id="youtube-player"></div>
+        <div id="soundcloud-player-container">
+            <iframe id="sc-widget" width="100%" height="100" scrolling="no" frameborder="no"></iframe>
         </div>
         
         <div id="question-display">Klik "Mulai Kuis" untuk memulai tantangan tebak lagu ini!</div>
@@ -99,39 +99,30 @@
         <button id="telegram-share-button">Bagikan Skor ke @GW_GK</button>
     </div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://w.soundcloud.com/player/api.js"></script>
 
     <script>
-        // --- DATA PERTANYAAN (GUNAKAN ARRAY UNTUK MULTI-ID) ---
+        // Data Pertanyaan (Gunakan URL SoundCloud)
+        // **CATATAN:** GANTI DENGAN URL TRACK PUBLIC YANG SESUAI!
         const questions = [
             {
-                q: "Dengarkan klip ini. Lagu hits pop Mahalini yang rilis 2023 ini berjudul:",
-                // Masukkan beberapa ID. Sistem akan mencoba ID pertama, jika error akan mencoba yang kedua, dst.
-                youtubeIds: ["AzHjARa84bI", "vB8k5tJ8-u0"], // Lirik/Karaoke lebih dulu
-                currentIdIndex: 0, // Indeks ID yang sedang dicoba
+                q: "Dengarkan klip ini. Lagu hits pop Indonesia yang rilis 2022 ini berjudul:",
+                // Contoh URL track SoundCloud (Ini mungkin perlu diganti)
+                trackUrl: "https://soundcloud.com/user-229237622/sial-mahalini-live-studio", 
                 options: ["Komang", "Sial", "Tertawan Hati", "Hati-Hati di Jalan"],
                 answer: "Sial",
-                startTime: 10, 
-                duration: 5    
+                startTime: 10000, // Mulai dari 10 detik (dalam milidetik)
+                duration: 5000    // Putar selama 5 detik (dalam milidetik)
             },
             {
                 q: "Ini adalah salah satu 'sound' paling viral di TikTok tahun 2023. Judul lagunya adalah:",
-                youtubeIds: ["wIo9gS0EKhE", "Tzzdu68zbvQ"], // Lirik/Cover lebih dulu
-                currentIdIndex: 0,
+                trackUrl: "https://soundcloud.com/user-307996535/rungkad-happy-asmara-full-audio", 
                 options: ["Rungkad", "Glimpse of Us", "Asmalibrasi", "Ayam Jago"],
                 answer: "Rungkad",
-                startTime: 5, 
-                duration: 7    
-            },
-            {
-                q: "Lagu dari Danar Widianto yang viral kembali karena dipakai di film horor:",
-                youtubeIds: ["RY1zQHjUG_Q", "pz9bGfyVlXQ"], 
-                currentIdIndex: 0,
-                options: ["Kisah Klasik", "Dulu", "Bertahan", "Menghapus Jejakmu"],
-                answer: "Dulu",
-                startTime: 20, 
-                duration: 6    
+                startTime: 5000, 
+                duration: 7000    
             }
+            // Tambahkan pertanyaan lain di sini
         ];
 
         
@@ -141,105 +132,73 @@
         const startButton = document.getElementById('start-button');
         const nextButton = document.getElementById('next-button');
         const telegramButton = document.getElementById('telegram-share-button');
-        const playerContainer = document.getElementById('youtube-player-container');
+        const playerContainer = document.getElementById('soundcloud-player-container');
         
         let currentQuestionIndex = 0;
         let score = 0;
-        let player;
+        let widget;
         let stopPlaybackTimeout;
         let playAgainButton;
+        let isPlayerReady = false;
 
-        // --- HANDLER ERROR PLAYER YOUTUBE (Auto-ganti ID jika error) ---
-        function onPlayerError(event) {
-            const q = questions[currentQuestionIndex];
+        // --- Fungsi API SoundCloud Widget ---
+
+        function initSoundCloudWidget(url, callback) {
+            // Muat ulang iframe dengan URL track baru
+            const iframe = document.getElementById('sc-widget');
+            iframe.src = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false&buying=false&download=false`;
+
+            // Buat objek widget baru
+            widget = SC.Widget(iframe);
             
-            // Coba ID berikutnya
-            q.currentIdIndex++;
-
-            if (q.currentIdIndex < q.youtubeIds.length) {
-                // Ada ID alternatif, coba muat ID berikutnya
-                resultDisplay.innerHTML = `<span style="color: #f39c12;">⚠️ Video Soal ${currentQuestionIndex + 1} Gagal Dimuat. Mencoba ID Alternatif (${q.currentIdIndex + 1}/${q.youtubeIds.length})...</span>`;
-                console.warn(`Error code ${event.data}. Trying next ID: ${q.youtubeIds[q.currentIdIndex]}`);
-                
-                // Muat ulang video dengan ID berikutnya
-                setTimeout(() => {
-                    player.loadVideoById(q.youtubeIds[q.currentIdIndex], q.startTime);
-                    playClue();
-                }, 1000); 
-
-            } else {
-                // Semua ID gagal
-                console.error("Semua ID video gagal dimuat:", q.youtubeIds);
-                resultDisplay.innerHTML = `<span style="color: #e74c3c;">❌ Error: Semua Video Soal ${currentQuestionIndex + 1} Gagal Dimuat. Otomatis Ganti Soal...</span>`;
-                
-                // Pindah ke soal berikutnya
-                setTimeout(() => {
-                    currentQuestionIndex++;
-                    loadQuestion();
-                }, 2000); 
-            }
-        }
-        
-        // --- Fungsi API YouTube Player ---
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
-                height: '100%',
-                width: '100%',
-                videoId: '',
-                playerVars: {
-                    'playsinline': 1,
-                    'controls': 1, 
-                    'disablekb': 1,
-                    'rel': 0, 
-                    'modestbranding': 1,
-                    'autoplay': 1,  
-                    'mute': 1       
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError 
-                }
+            widget.bind(SC.Widget.Events.READY, function() {
+                isPlayerReady = true;
+                if (callback) callback();
             });
-        }
-        
-        function onPlayerReady(event) {
-            startButton.disabled = false;
+
+            // Tambahkan error handling minimal (jika widget tidak bisa dimuat)
+            setTimeout(() => {
+                if (!isPlayerReady && url !== questions[currentQuestionIndex].trackUrl) {
+                    console.error("SoundCloud widget gagal dimuat untuk URL:", url);
+                    // Panggil fungsi error untuk pindah ke soal berikutnya
+                    onPlayerError(); 
+                }
+            }, 5000); 
         }
 
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                const q = questions[currentQuestionIndex];
-                clearTimeout(stopPlaybackTimeout);
-                
-                stopPlaybackTimeout = setTimeout(() => {
-                    player.stopVideo();
-                    player.seekTo(q.startTime, true); 
-                    if(playAgainButton) playAgainButton.textContent = '🔊 Putar Ulang Klip';
-                }, q.duration * 1000); 
-            }
+        // --- HANDLER ERROR PLAYER SOUNDCLOUD ---
+        function onPlayerError() {
+            console.error("SoundCloud Player Error: Gagal memuat atau error tak terduga.");
+            resultDisplay.innerHTML = `<span style="color: #e74c3c;">❌ Track Soal ${currentQuestionIndex + 1} Gagal Dimuat! Otomatis Ganti Soal...</span>`;
+            
+            // Auto-advance ke pertanyaan berikutnya
+            currentQuestionIndex++;
+            
+            setTimeout(() => {
+                loadQuestion();
+            }, 2000); 
         }
-        
+
         // --- Fungsi Kontrol Pemutaran ---
         function playClue() {
-            if (!player || currentQuestionIndex >= questions.length || startButton.style.display !== 'none') return;
+            if (!widget || !isPlayerReady || currentQuestionIndex >= questions.length) return;
             
             const q = questions[currentQuestionIndex];
-            
             clearTimeout(stopPlaybackTimeout);
             
-            // Dapatkan ID video yang sedang dicoba
-            const videoId = q.youtubeIds[q.currentIdIndex];
+            // Pindahkan ke titik mulai (dalam milidetik)
+            widget.seekTo(q.startTime);
+            
+            // Mulai putar
+            widget.play();
 
-            if (player.getVideoData().video_id !== videoId) {
-                player.loadVideoById(videoId, q.startTime);
-            } else {
-                player.seekTo(q.startTime, true);
-                player.playVideo();
-            }
             if(playAgainButton) playAgainButton.textContent = '▶️ Memutar...';
             
-            resultDisplay.innerHTML = '<span style="color: #f1c40f; font-size: 0.9em;">⚠️ Jika tidak ada suara, klik tombol Mute/Volume di player di atas!</span>';
+            // Atur timeout untuk menghentikan pemutaran setelah durasi klip
+            stopPlaybackTimeout = setTimeout(() => {
+                widget.pause();
+                if(playAgainButton) playAgainButton.textContent = '🔊 Putar Ulang Klip';
+            }, q.duration); 
         }
 
         // --- Fungsi Utama Game ---
@@ -251,13 +210,8 @@
             resultDisplay.textContent = '';
             playerContainer.style.display = 'block'; 
             
-            // Reset semua indeks video yang dicoba
-            questions.forEach(q => q.currentIdIndex = 0);
-            
-            const firstQ = questions[0];
-            player.loadVideoById(firstQ.youtubeIds[0], firstQ.startTime);
-            
-            setTimeout(loadQuestion, 500); 
+            // Inisialisasi widget dengan track pertama
+            initSoundCloudWidget(questions[0].trackUrl, loadQuestion);
         }
 
         function loadQuestion() {
@@ -271,10 +225,16 @@
             qDisplay.innerHTML = `<strong>Soal ${currentQuestionIndex + 1}:</strong> ${q.q}`;
             optionsContainer.innerHTML = '';
             nextButton.style.display = 'none';
+            resultDisplay.textContent = '';
             
-            // Muat video pertama (atau video yang terakhir dicoba jika error)
-            player.loadVideoById(q.youtubeIds[q.currentIdIndex], q.startTime);
-            
+            // Muat track baru jika diperlukan
+            if (widget && isPlayerReady && q.trackUrl !== document.getElementById('sc-widget').src.split('url=')[1].split('&')[0]) {
+                 initSoundCloudWidget(q.trackUrl, playClue);
+            } else {
+                playClue();
+            }
+
+            // Tampilkan tombol opsi
             q.options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
@@ -283,20 +243,19 @@
                 optionsContainer.appendChild(button);
             });
             
+            // Tambahkan tombol play manual/ulang
             playAgainButton = document.createElement('button');
             playAgainButton.textContent = '🔊 Putar Ulang Klip';
             playAgainButton.style.cssText = 'padding: 10px 20px; background-color: #1abc9c; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;';
             playAgainButton.addEventListener('click', playClue);
             optionsContainer.insertBefore(playAgainButton, optionsContainer.firstChild);
-
-            playClue();
         }
 
         function checkAnswer(clickedButton, selectedOption, correctAnswer) {
             Array.from(optionsContainer.children).forEach(btn => btn.disabled = true);
             
             clearTimeout(stopPlaybackTimeout);
-            player.stopVideo();
+            if (widget) widget.pause();
             
             if (selectedOption === correctAnswer) {
                 score++;
@@ -317,8 +276,7 @@
             optionsContainer.innerHTML = '';
             nextButton.style.display = 'none';
             playerContainer.style.display = 'none';
-            resultDisplay.textContent = ''; 
-
+            
             let finalStatus = (score === questions.length) ? '🥇 MUSIKOLOG VIRAL SEJATI!' : '🎧 Masih Perlu Banyak Mendengar Lagu Hits.';
             
             resultDisplay.innerHTML = `
@@ -333,17 +291,17 @@
 
         function shareTelegram() {
             const finalStatus = (score === questions.length) ? 'MUSIKOLOG VIRAL SEJATI' : 'Perlu Banyak Mendengar Lagu Hits';
-            const shareMessage = `Aku menyelesaikan Kuis Tebak Lagu Viral (YouTube) dengan skor ${score}/${questions.length}! Aku adalah ${finalStatus}. Coba kamu, @GW_GK!`;
+            const shareMessage = `Aku menyelesaikan Kuis Tebak Lagu Viral (SoundCloud) dengan skor ${score}/${questions.length}! Aku adalah ${finalStatus}. Coba kamu, @GW_GK!`;
             const url = `https://t.me/GW_GK?text=${encodeURIComponent(shareMessage)}`;
             window.open(url, '_blank');
         }
 
+        // Event Listeners
         startButton.addEventListener('click', startGame);
         nextButton.addEventListener('click', () => { currentQuestionIndex++; loadQuestion(); });
         telegramButton.addEventListener('click', shareTelegram);
 
-        optionsContainer.innerHTML = '<p style="color:#bdc3c7;">Player YouTube harus siap sebelum tombol "Mulai Kuis" aktif. Tunggu sebentar...</p>';
-        startButton.disabled = true;
+        optionsContainer.innerHTML = '<p style="color:#bdc3c7;">Siap diuji dengan klip musik SoundCloud? Klik Mulai!</p>';
     </script>
 </body>
 </html>
