@@ -121,7 +121,7 @@ async function edit() {
   form.append("size", sizeSelect.value);
   form.append("enhance", enhanceSelect.value);
 
-  const workerURL = "https://square-heart-4c30.stevdev69.workers.dev/"; // GANTI DENGAN PUNYAMU
+  const workerURL = "https://gk.stevdev69.workers.dev"; // GANTI DENGAN PUNYAMU
 
   try {
     const response = await fetch(workerURL, { method: "POST", body: form });
