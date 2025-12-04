@@ -109,8 +109,8 @@
                 youtubeId: "vB8k5tJ8-u0", 
                 options: ["Komang", "Sial", "Tertawan Hati", "Hati-Hati di Jalan"],
                 answer: "Sial",
-                startTime: 10, // Mulai putar dari detik ke-10
-                duration: 5    // Putar selama 5 detik
+                startTime: 10, 
+                duration: 5    
             },
             {
                 q: "Ini adalah salah satu 'sound' paling viral di TikTok tahun 2023. Judul lagunya adalah:",
@@ -145,6 +145,22 @@
         let stopPlaybackTimeout;
         let playAgainButton;
 
+        // --- HANDLER ERROR PLAYER YOUTUBE BARU ---
+        function onPlayerError(event) {
+            console.error("YouTube Player Error Code:", event.data);
+            
+            // Tampilkan pesan error dan auto-advance
+            resultDisplay.innerHTML = `<span style="color: #e74c3c;">❌ Video Soal ${currentQuestionIndex + 1} Gagal Dimuat! (${event.data}) Otomatis Ganti...</span>`;
+            
+            // Auto-advance ke pertanyaan berikutnya
+            currentQuestionIndex++;
+            
+            // Beri jeda 1.5 detik agar pengguna sempat membaca pesan error
+            setTimeout(() => {
+                loadQuestion();
+            }, 1500); 
+        }
+        
         // --- Fungsi API YouTube Player ---
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
@@ -153,16 +169,17 @@
                 videoId: '',
                 playerVars: {
                     'playsinline': 1,
-                    'controls': 1, // Kita tampilkan kontrol agar pengguna bisa unmute
+                    'controls': 1, 
                     'disablekb': 1,
                     'rel': 0, 
                     'modestbranding': 1,
-                    'autoplay': 1,  // PENTING: Minta autoplay
-                    'mute': 1       // PENTING: Autoplay seringkali hanya diizinkan jika mute
+                    'autoplay': 1,  
+                    'mute': 1       
                 },
                 events: {
                     'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError // DAFTARKAN HANDLER ERROR DI SINI
                 }
             });
         }
@@ -200,7 +217,6 @@
             }
             if(playAgainButton) playAgainButton.textContent = '▶️ Memutar...';
             
-            // Tambahkan pesan panduan jika player ter-mute
             resultDisplay.innerHTML = '<span style="color: #f1c40f; font-size: 0.9em;">⚠️ Jika tidak ada suara, klik tombol Mute/Volume di player di atas!</span>';
         }
 
@@ -213,11 +229,9 @@
             resultDisplay.textContent = '';
             playerContainer.style.display = 'block'; 
             
-            // Muat video pertama untuk inisialisasi
             const firstQ = questions[0];
             player.loadVideoById(firstQ.youtubeId, firstQ.startTime);
             
-            // Berikan waktu sebentar untuk player memuat sebelum memanggil loadQuestion
             setTimeout(loadQuestion, 500); 
         }
 
@@ -233,10 +247,8 @@
             optionsContainer.innerHTML = '';
             nextButton.style.display = 'none';
             
-            // Load video klip (dan autoplay akan mencoba memutar)
             player.loadVideoById(q.youtubeId, q.startTime);
             
-            // Tambahkan tombol opsi
             q.options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
@@ -245,7 +257,6 @@
                 optionsContainer.appendChild(button);
             });
             
-            // Tambahkan tombol play manual/ulang
             playAgainButton = document.createElement('button');
             playAgainButton.textContent = '🔊 Putar Ulang Klip';
             playAgainButton.style.cssText = 'padding: 10px 20px; background-color: #1abc9c; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;';
@@ -280,8 +291,7 @@
             optionsContainer.innerHTML = '';
             nextButton.style.display = 'none';
             playerContainer.style.display = 'none';
-            resultDisplay.textContent = ''; // Kosongkan peringatan volume
-
+            
             let finalStatus = (score === questions.length) ? '🥇 MUSIKOLOG VIRAL SEJATI!' : '🎧 Masih Perlu Banyak Mendengar Lagu Hits.';
             
             resultDisplay.innerHTML = `
