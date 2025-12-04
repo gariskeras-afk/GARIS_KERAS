@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game 11: Perfect Loop Click</title>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #121212; color: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        h1 { color: #f0f0f0; margin-bottom: 5px; }
+        #game-area { width: 400px; height: 10px; background-color: #333; margin: 30px 0; position: relative; border-radius: 5px; }
+        #slider { width: 50px; height: 10px; background-color: #61dafb; position: absolute; left: 0; transition: none; }
+        #target { width: 30px; height: 10px; background-color: #ff69b4; position: absolute; left: calc(50% - 15px); }
+        #score-display { font-size: 1.8em; margin: 15px 0; font-weight: 600; color: #2ecc71; }
+        #aesthetic-rating { font-size: 2.5em; color: #f1c40f; font-weight: 800; margin-top: 10px; }
+        button { padding: 12px 25px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: background-color 0.2s; }
+        #start-button { background-color: #ff69b4; color: white; }
+        #stop-button { background-color: #61dafb; color: #121212; display: none; }
+        #telegram-share-button { background-color: #0088cc; color: white; display: none; }
+        #kembali { position: absolute; top: 20px; left: 20px; color: #e0e0e0; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" id="kembali">← Menu</a>
+    <h1>✨ Perfect Loop Click</h1>
+    <p>Klik STOP agar slider biru tepat menimpa target pink!</p>
+    
+    <div id="game-area">
+        <div id="slider"></div>
+        <div id="target"></div>
+    </div>
+    
+    <div id="aesthetic-rating"></div>
+    <div id="score-display">0% Aesthetic</div>
+    
+    <button id="start-button">Mulai Loop</button>
+    <button id="stop-button" style="display: none;">STOP AESTHETIC!</button>
+    <button id="telegram-share-button">Pamer Skor Aesthetic ke @GW_GK</button>
+
+    <script>
+        const slider = document.getElementById('slider');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const aestheticRating = document.getElementById('aesthetic-rating');
+        const scoreDisplay = document.getElementById('score-display');
+        const telegramButton = document.getElementById('telegram-share-button');
+
+        let animationFrame;
+        let startTime;
+        let isMoving = false;
+        const totalWidth = 400; // Lebar game-area
+        const sliderWidth = 50;
+        const targetWidth = 30;
+        const targetCenter = totalWidth / 2; // Posisi ideal (200px)
+
+        function initializeGame() {
+            isMoving = true;
+            startTime = performance.now();
+            startButton.style.display = 'none';
+            stopButton.style.display = 'block';
+            telegramButton.style.display = 'none';
+            aestheticRating.textContent = '';
+            scoreDisplay.textContent = 'Mulai fokus...';
+            animateLoop(startTime);
+        }
+
+        function animateLoop(timestamp) {
+            if (!isMoving) return;
+
+            const elapsed = timestamp - startTime;
+            const speed = 0.05; // Kecepatan gerak
+            const cycleDuration = totalWidth / speed; // Waktu untuk satu bolak-balik (simulasi)
+            
+            // Gerakan Ping-Pong
+            let progress = (elapsed % (2 * cycleDuration)) / cycleDuration;
+            let currentX;
+
+            if (progress < 1) {
+                // Kiri ke Kanan
+                currentX = progress * (totalWidth - sliderWidth);
+            } else {
+                // Kanan ke Kiri
+                currentX = (2 - progress) * (totalWidth - sliderWidth);
+            }
+
+            slider.style.left = `${currentX}px`;
+
+            animationFrame = requestAnimationFrame(animateLoop);
+        }
+
+        function stopLoop() {
+            if (!isMoving) return;
+            
+            cancelAnimationFrame(animationFrame);
+            isMoving = false;
+            stopButton.style.display = 'none';
+
+            const sliderRect = slider.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+
+            // Hitung posisi tengah
+            const sliderCenter = slider.offsetLeft + sliderWidth / 2;
+            const targetIdealCenter = 200; 
+
+            // Error dihitung dari seberapa jauh center slider dari center target
+            const error = Math.abs(sliderCenter - targetIdealCenter);
+            
+            // Konversi error ke persentase Aesthetic (lebih kecil error, lebih tinggi %)
+            let aestheticScore = Math.max(0, 100 - (error * 1.5));
+            aestheticScore = Math.round(aestheticScore * 100) / 100; // Dua desimal
+
+            aestheticRating.textContent = `${aestheticScore.toFixed(2)}%`;
+            
+            let status = 'Not Aesthetic';
+            if (aestheticScore >= 99) { status = 'PERFECTION! 👑'; }
+            else if (aestheticScore >= 95) { status = 'So Aesthetic! ✨'; }
+            else if (aestheticScore >= 80) { status = 'Lumayan Vibe!'; }
+            
+            scoreDisplay.textContent = status;
+            
+            startButton.textContent = 'Coba Loop Lagi';
+            startButton.style.display = 'block';
+            telegramButton.style.display = 'block';
+        }
+
+        function shareTelegram() {
+            const score = aestheticRating.textContent;
+            const status = scoreDisplay.textContent;
+            const shareMessage = `Aku berhasil mencapai *Aesthetic Rating* ${score} di Game Perfect Loop Click! Status: ${status} Coba kamu, @GW_GK!`;
+            const url = `https://t.me/GW_GK?text=${encodeURIComponent(shareMessage)}`;
+            window.open(url, '_blank');
+        }
+
+        stopButton.addEventListener('click', stopLoop);
+        startButton.addEventListener('click', initializeGame);
+        telegramButton.addEventListener('click', shareTelegram);
+
+        aestheticRating.textContent = '0.00%';
+        scoreDisplay.textContent = 'Klik Mulai untuk mencari kesempurnaan.';
+    </script>
+</body>
+</html>
