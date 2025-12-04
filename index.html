@@ -3,54 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uji Kesabaran Level Dewa</title>
+    <title>Uji Kesabaran Level DEWA (Dijamin Emosi!)</title>
+    
+    <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😠</text></svg>">
+    
     <style>
-        /* CSS: Desain yang "Sengaja Jelek" dan Menyakitkan Mata */
+        /* CSS: Desain yang "Sengaja Jelek" dan Menyebalkan */
         body {
             margin: 0;
             padding: 0;
             height: 100vh;
             background-color: #ff00ff; /* Magenta Terang */
-            color: #ffff00; /* Kuning Terang */
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Font legendaris */
+            color: #ffff00; /* Kuning Neon */
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* Mencegah scroll */
-            user-select: none; /* Teks tidak bisa diblok */
+            overflow: hidden; 
+            user-select: none; 
         }
 
         h1 {
-            text-shadow: 2px 2px #000;
+            text-shadow: 3px 3px #000000;
             text-align: center;
             font-size: 3rem;
             margin-bottom: 20px;
         }
-
-        #game-area {
-            display: none; /* Disembunyikan dulu saat loading */
-            text-align: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Tombol yang akan kabur */
-        #btn-duit {
-            position: absolute;
-            padding: 15px 30px;
-            font-size: 20px;
-            background-color: #00ff00; /* Hijau Neon */
-            color: blue;
-            border: 5px border-style dashed red;
-            font-weight: bold;
-            cursor: progress; /* Kursor loading biar bingung */
-            border-radius: 50px;
-            box-shadow: 5px 5px 0px #000;
-            transition: top 0.1s, left 0.1s; /* Gerakan instan */
-        }
-
-        /* Layar Loading Palsu */
+        
+        /* Loading Screen Styling */
         #loading-screen {
             font-size: 24px;
             font-weight: bold;
@@ -72,6 +53,62 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Area Game Styling */
+        #game-area {
+            display: none; 
+            text-align: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Tombol Kabur */
+        #btn-duit {
+            position: absolute;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #00ff00; /* Hijau Neon */
+            color: blue;
+            border: 5px dashed red;
+            font-weight: bold;
+            cursor: progress; /* Kursor loading */
+            border-radius: 50px;
+            box-shadow: 5px 5px 0px #000;
+            transition: top 0.1s, left 0.1s; 
+            z-index: 50; /* Pastikan di atas elemen lain */
+        }
+        
+        /* Pop-up Iklan Palsu Styling */
+        .fake-popup-content {
+            position:fixed; 
+            top:20%; 
+            left:50%; 
+            transform:translateX(-50%); 
+            padding:20px; 
+            background:#fff; 
+            border:5px solid red; 
+            z-index:100; 
+            box-shadow:0 0 15px #000; 
+            text-align:center;
+            color:black;
+            animation: bounce 1s infinite alternate; /* Animasi memantul */
+        }
+        
+        @keyframes bounce {
+            from { transform: translate(-50%, 0); }
+            to { transform: translate(-50%, -10px); }
+        }
+
+        #popup-overlay {
+            position:fixed; 
+            top:0; 
+            left:0; 
+            width:100%; 
+            height:100%; 
+            background:rgba(0,0,0,0.7); 
+            z-index:99;
+        }
+
     </style>
 </head>
 <body oncontextmenu="return false;"> <div id="loading-screen">
@@ -81,26 +118,43 @@
 
     <div id="game-area">
         <h1 id="judul">KLIK TOMBOL UNTUK MENANG RP 100 JUTA!</h1>
-        <button id="btn-duit" onclick="alert('YAH! KAMU HAMPIR MENANG! COBA LAGI!')">AMBIL HADIAH</button>
+        <input type="text" id="fake-input" placeholder="Jangan Ketik di sini!" style="margin-bottom: 20px; padding: 10px; font-size: 16px; border: 3px dashed yellow; background: black; color: white;">
+        <button id="btn-duit" onclick="alert('YAH! KAMU HAMPIR MENANG! COBA LAGI, KALAU BISA!')">AMBIL HADIAH</button>
+    </div>
+    
+    <div id="fake-popup" style="display:none;">
+        <div class="fake-popup-content">
+            <p style="font-size:1.5rem; font-weight:bold;">DISKON HEBOH KHUSUS HARI INI!</p>
+            <p style="color:red; font-size:2rem;">BELI SEKARANG, GRATIS ONGKIR!</p>
+            <button id="close-btn" style="padding:10px 20px; background:red; color:white; border:none; margin-top:10px; cursor:pointer;">TUTUP (GAK BISA)</button>
+        </div>
+        <div id="popup-overlay"></div>
     </div>
 
-    <script>
-        // JAVASCRIPT: Otak dari kejahilan ini
 
-        // 1. Logika Loading Palsu
+    <script>
+        // JAVASCRIPT: Otak dari semua kejahilan ini
+
         const loadingScreen = document.getElementById('loading-screen');
         const gameArea = document.getElementById('game-area');
         const loadingText = document.getElementById('loading-text');
-
-        const texts = [
-            "Menghubungkan ke Server NASA...",
-            "Mencari Sinyal 6G...",
-            "Mengunduh RAM Tambahan...",
-            "Hampir Selesai (Bohong)...",
-            "Sabar Ya..."
-        ];
-
+        const btn = document.getElementById('btn-duit');
+        const judul = document.getElementById('judul');
+        const fakeInput = document.getElementById('fake-input');
+        const fakePopup = document.getElementById('fake-popup');
+        const closeBtn = document.getElementById('close-btn');
+        const favicon = document.getElementById('favicon');
+        
+        // --- 1. Logika Loading Palsu dan Inisialisasi Game ---
+        const texts = ["Menghubungkan ke Server NASA...", "Mencari Sinyal 6G...", "Mengunduh RAM Tambahan...", "Hampir Selesai (Bohong)...", "Sabar Ya..."];
         let i = 0;
+        
+        function centerButton() {
+            btn.style.left = "50%";
+            btn.style.top = "60%";
+            btn.style.transform = "translate(-50%, -50%)";
+        }
+
         const interval = setInterval(() => {
             loadingText.innerText = texts[i];
             i++;
@@ -108,54 +162,72 @@
                 clearInterval(interval);
                 loadingScreen.style.display = 'none';
                 gameArea.style.display = 'block';
-                // Posisikan tombol di tengah saat mulai
-                centerButton();
+                centerButton(); // Posisikan tombol di tengah saat mulai
+                
+                // Mulai Trolling Pop-up setelah game dimulai
+                setTimeout(() => {
+                    fakePopup.style.display = 'block';
+                }, 4000); // Muncul setelah 4 detik bermain
             }
-        }, 800); // Ganti teks setiap 0.8 detik
+        }, 800); 
 
-        // 2. Logika Tombol Kabur
-        const btn = document.getElementById('btn-duit');
-        const judul = document.getElementById('judul');
-
+        // --- 2. Logika Tombol Kabur ---
         function moveButton() {
-            // Ambil ukuran layar
             const w = window.innerWidth;
             const h = window.innerHeight;
             
-            // Hitung posisi acak (dikurangi ukuran tombol biar gak keluar layar)
-            const newX = Math.floor(Math.random() * (w - 150));
-            const newY = Math.floor(Math.random() * (h - 100));
+            const newX = Math.floor(Math.random() * (w - 180)); // 180 = lebar tombol
+            const newY = Math.floor(Math.random() * (h - 150)); // 150 = tinggi tombol
 
             btn.style.left = newX + "px";
             btn.style.top = newY + "px";
 
             // Ubah teks judul untuk mengejek
-            const ejekan = [
-                "AYO DONG!", "PAYAH!", "KURANG CEPAT!", 
-                "JARINYA KAKU YA?", "NYERAH AJA DEH!", "HAHAHA!"
-            ];
+            const ejekan = ["AYO DONG!", "PAYAH!", "KURANG CEPAT!", "JARINYA KAKU YA?", "NYERAH AJA DEH!", "HAHAHA!"];
             const randomEjek = ejekan[Math.floor(Math.random() * ejekan.length)];
             judul.innerText = randomEjek;
         }
 
-        function centerButton() {
-            btn.style.left = "50%";
-            btn.style.top = "50%";
-            btn.style.transform = "translate(-50%, -50%)";
-        }
-
-        // Trigger saat mouse mendekat (Desktop)
         btn.addEventListener('mouseover', () => {
-            btn.style.transform = "none"; // Hapus centering CSS
-            moveButton();
-        });
-
-        // Trigger saat disentuh (HP/Mobile)
-        btn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Mencegah klik beneran
             btn.style.transform = "none";
             moveButton();
         });
+
+        // Untuk perangkat sentuh
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            btn.style.transform = "none";
+            moveButton();
+        });
+
+        // --- 3. Logika Koreksi Otomatis yang Mengganggu ---
+        fakeInput.addEventListener('input', () => {
+            const currentVal = fakeInput.value;
+            if (currentVal.length > 2) {
+                const trollWords = ["GAGAL", "LAMBAT", "BOCOR", "SEDIH", "SUSAH", "PUSING", "BERAT", "NOOB"];
+                const randomWord = trollWords[Math.floor(Math.random() * trollWords.length)];
+
+                setTimeout(() => {
+                    fakeInput.value = randomWord; 
+                }, 100); 
+            }
+        });
+
+        // --- 4. Logika Pop-up yang Tidak Bisa Ditutup ---
+        closeBtn.addEventListener('click', () => {
+            alert('Ups! Tombol tutupnya rusak. Silakan nikmati iklannya selagi bermain.');
+        });
+        
+        // --- 5. Logika Favicon Berubah (Troll di tab browser) ---
+        const icons = ['😠', '🤦‍♀️', '🤯', '😭', '🤡', '😵']; 
+        let iconIndex = 0;
+
+        setInterval(() => {
+            iconIndex = (iconIndex + 1) % icons.length;
+            favicon.setAttribute('href', 
+                `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icons[iconIndex]}</text></svg>`
+            );
+        }, 1200); // Ganti setiap 1.2 detik, bikin pusing!
 
     </script>
 </body>
