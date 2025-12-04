@@ -3,157 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade Portal: Game Pilihan Terbaik</title>
+    <title>Arcade Portal: Game Pilihan Terbaik (11 Games!)</title>
     <style>
-        /* FONT IMPORT (Opsional, tapi membuat tampilan lebih fresh) */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* Gradien Biru Gelap */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: #ecf0f1;
             text-align: center;
             padding: 20px;
             margin: 0;
             min-height: 100vh;
         }
-
-        #header {
-            margin: 40px 0 20px 0;
-        }
+        #header { margin: 40px 0 20px 0; }
         h1 {
-            font-size: 3.5em;
-            color: #f39c12; /* Oranye Terang */
-            text-shadow: 2px 2px #c0392b;
-            margin-bottom: 5px;
-            font-weight: 800;
+            font-size: 3.5em; color: #f39c12;
+            text-shadow: 2px 2px #c0392b; margin-bottom: 5px; font-weight: 800;
         }
-        #subtitle {
-            font-size: 1.2em;
-            color: #bdc3c7;
-            font-weight: 400;
-        }
+        #subtitle { font-size: 1.2em; color: #bdc3c7; font-weight: 400; }
 
         #games-grid {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1200px; margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Tata Letak Kartu Responsif */
-            gap: 25px;
-            padding: 30px 0;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px; padding: 30px 0;
         }
 
         .game-card {
-            background-color: #ffffff;
-            color: #2c3e50;
-            padding: 25px;
-            border-radius: 15px;
-            text-decoration: none;
+            background-color: #ffffff; color: #2c3e50; padding: 25px;
+            border-radius: 15px; text-decoration: none;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s, box-shadow 0.3s;
-            border-bottom: 5px solid transparent;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            border-bottom: 5px solid transparent; display: flex;
+            flex-direction: column; justify-content: space-between;
         }
 
         .game-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            border-bottom-color: var(--card-color); /* Warna border sesuai tema kartu */
+            border-bottom-color: var(--card-color);
         }
         
-        .game-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--card-color); /* Warna judul sesuai tema */
-        }
+        .game-title { font-size: 1.5em; font-weight: 600; margin-bottom: 5px; color: var(--card-color); }
+        .game-emoji { font-size: 2.5em; margin-bottom: 15px; }
+        .game-description { font-size: 0.95em; color: #7f8c8d; margin-top: 10px; }
 
-        .game-emoji {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-        
-        .game-description {
-            font-size: 0.95em;
-            color: #7f8c8d;
-            margin-top: 10px;
-        }
+        /* Warna Tema */
+        .card-troll { --card-color: #e74c3c; } .card-gombal { --card-color: #ff69b4; }
+        .card-iq { --card-color: #f1c40f; } .card-support { --card-color: #2ecc71; } 
+        .card-absurd { --card-color: #9b59b6; } .card-kraepelin { --card-color: #3498db; }
+        .card-visual { --card-color: #e67e22; } .card-genz { --card-color: #61dafb; } /* Warna Baru untuk Gen Z */
 
-        /* Warna Tema untuk Setiap Kategori Game */
-        .card-troll { --card-color: #e74c3c; } /* Merah - Ngeselin */
-        .card-gombal { --card-color: #ff69b4; } /* Pink - Gombal */
-        .card-iq { --card-color: #f1c40f; } /* Kuning - IQ/Logika */
-        .card-support { --card-color: #2ecc71; } /* Hijau - Dukungan */
-        .card-absurd { --card-color: #9b59b6; } /* Ungu - Absurd/Lucu */
-        .card-kraepelin { --card-color: #3498db; } /* Biru - Fokus */
-        .card-visual { --card-color: #e67e22; } /* Oranye - Visual */
-
-        #footer-note {
-            margin-top: 40px;
-            color: #bdc3c7;
-            font-size: 0.9em;
-            padding-bottom: 20px;
-        }
+        #footer-note { margin-top: 40px; color: #bdc3c7; font-size: 0.9em; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div id="header">
         <h1>ARCADE PORTAL</h1>
-        <p id="subtitle">Pilihan Game Lucu, Ngeselin, dan Menantang!</p>
+        <p id="subtitle">Total 11 Game Bervariasi: Dari Ngeselin Hingga Estetika Gen Z!</p>
     </div>
 
     <div id="games-grid">
         
-        <a href="game_lucu.html" class="game-card card-absurd">
-            <span class="game-emoji">🤣</span>
-            <span class="game-title">Kuis Absurd</span>
-            <span class="game-description">Uji kemampuanmu menebak jawaban yang paling tidak masuk akal.</span>
-        </a>
+        <a href="game_lucu.html" class="game-card card-absurd"> <span class="game-emoji">🤣</span> <span class="game-title">Kuis Absurd</span> <span class="game-description">Uji kemampuanmu menebak jawaban yang paling tidak masuk akal.</span> </a>
         
-        <a href="game_ngeselin.html" class="game-card card-troll">
-            <span class="game-emoji">😠</span>
-            <span class="game-title">Tombol Ngeselin</span>
-            <span class="game-description">Bisakah kamu mengklik tombol yang selalu menghindar? Uji kesabaranmu!</span>
-        </a>
+        <a href="game_ngeselin.html" class="game-card card-troll"> <span class="game-emoji">😠</span> <span class="game-title">Tombol Ngeselin</span> <span class="game-description">Bisakah kamu mengklik tombol yang selalu menghindar? Uji kesabaran!</span> </a>
         
-        <a href="game_gombal.html" class="game-card card-gombal">
-            <span class="game-emoji">💖</span>
-            <span class="game-title">Ujian Gombal Sultan</span>
-            <span class="game-description">Pilih *gombalan* ter-cheesy untuk membuktikan cintamu.</span>
-        </a>
+        <a href="game_gombal.html" class="game-card card-gombal"> <span class="game-emoji">💖</span> <span class="game-title">Ujian Gombal Sultan</span> <span class="game-description">Pilih *gombalan* ter-cheesy untuk membuktikan cintamu.</span> </a>
         
-        <a href="game_iq.html" class="game-card card-iq">
-            <span class="game-emoji">🧠</span>
-            <span class="game-title">IQ Memori Visual</span>
-            <span class="game-description">Hafalkan urutan lampu yang berkedip. Setiap level semakin sulit!</span>
-        </a>
+        <a href="game_iq.html" class="game-card card-iq"> <span class="game-emoji">🧠</span> <span class="game-title">IQ Memori Visual</span> <span class="game-description">Hafalkan urutan lampu yang berkedip. Setiap level semakin sulit!</span> </a>
 
-        <a href="game_sahabat.html" class="game-card card-support">
-            <span class="game-emoji">🫂</span>
-            <span class="game-title">Sahabat Virtual</span>
-            <span class="game-description">Sentuh untuk mendapatkan pesan dukungan dan afirmasi hangat instan.</span>
-        </a>
-        
-        <a href="game_krapelin.html" class="game-card card-kraepelin">
-            <span class="game-emoji">⏱️</span>
-            <span class="game-title">Kraepelin Speed Test</span>
-            <span class="game-description">Tes penjumlahan cepat Kraepelin. Uji fokus dan ketahanan mentalmu.</span>
-        </a>
+        <a href="game_hilang.html" class="game-card card-visual"> <span class="game-emoji">🔎</span> <span class="game-title">Cari Huruf Hilang</span> <span class="game-description">Uji ketajaman matamu mencari satu karakter yang tersembunyi.</span> </a>
 
-        <a href="game_hilang.html" class="game-card card-visual">
-            <span class="game-emoji">🔎</span>
-            <span class="game-title">Cari Huruf Hilang</span>
-            <span class="game-description">Uji ketajaman matamu mencari satu karakter yang tersembunyi.</span>
-        </a>
+        <a href="game_krapelin.html" class="game-card card-kraepelin"> <span class="game-emoji">⏱️</span> <span class="game-title">Kraepelin Speed Test</span> <span class="game-description">Tes penjumlahan cepat. Uji fokus dan ketahanan mentalmu.</span> </a>
+
+        <a href="game_sahabat.html" class="game-card card-support"> <span class="game-emoji">🫂</span> <span class="game-title">Sahabat Virtual</span> <span class="game-description">Dapatkan pesan dukungan dan afirmasi hangat instan.</span> </a>
+        
+        <a href="game_meme.html" class="game-card card-genz"> <span class="game-emoji">🛑</span> <span class="game-title">Stop The Scroll</span> <span class="game-description">Reaksi cepat: Hentikan teks pada *timing* yang sempurna.</span> </a>
+        
+        <a href="game_gaul.html" class="game-card card-genz"> <span class="game-emoji">💅</span> <span class="game-title">Kuis Bahasa Gaul</span> <span class="game-description">Uji literasi budaya internet dan slang Gen Z terbaru!</span> </a>
+
+        <a href="game_aesthetic.html" class="game-card card-genz"> <span class="game-emoji">✨</span> <span class="game-title">Perfect Loop Click</span> <span class="game-description">Klik untuk mencapai skor Estetika 100%. Uji presisimu!</span> </a>
 
     </div>
 
     <p id="footer-note">
         Setiap game diakhiri dengan tombol untuk membagikan skormu ke Telegram @GW_GK!
     </p>
+
 
 </body>
 </html>
