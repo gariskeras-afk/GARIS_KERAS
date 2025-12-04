@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Ngeselin: Tombol Kabur</title>
+    <style>
+        body { font-family: 'Comic Sans MS', sans-serif; background-color: #ff00ff; color: #ffff00; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
+        h2 { position: absolute; top: 20px; color: white; text-shadow: 2px 2px black; }
+        #btn-kabur { position: absolute; padding: 20px 40px; font-size: 24px; background-color: #00ff00; color: blue; border: 5px dashed red; cursor: progress; border-radius: 10px; transition: 0.1s; z-index: 10; }
+        #kembali { position: absolute; bottom: 20px; background-color: #333; color: white; padding: 10px; border-radius: 5px; text-decoration: none; }
+        #telegram-share-button { position: absolute; bottom: 80px; background-color: #0088cc; color: white; padding: 10px; border-radius: 5px; text-decoration: none; border: none; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <h2>KLIK SAYA KALAU BISA!</h2>
+    
+    <button id="btn-kabur" onclick="winGame()">KLIK SAYA!</button>
+
+    <a href="index.html" id="kembali">← Menu Utama</a>
+    <button id="telegram-share-button" style="display: none;">Kirim Kegagalan ke @GW_GK</button>
+
+    <script>
+        const btn = document.getElementById('btn-kabur');
+        const telegramButton = document.getElementById('telegram-share-button');
+        let clickCount = 0;
+
+        function moveButton() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const newX = Math.floor(Math.random() * (w - 150)); 
+            const newY = Math.floor(Math.random() * (h - 100));
+            btn.style.left = newX + 'px';
+            btn.style.top = newY + 'px';
+        }
+
+        function winGame() {
+            clickCount++;
+            alert(`HEBAT! Kamu berhasil klik ${clickCount} kali! Sekarang game selesai.`)
+            btn.style.display = 'none';
+            document.querySelector('h2').textContent = 'Selamat! Kamu menyerah!';
+            telegramButton.style.display = 'block';
+        }
+
+        function shareTelegram() {
+            const shareMessage = `Aku berhasil klik tombol menyebalkan ${clickCount} kali sebelum menyerah! Coba kalau kamu bisa, @GW_GK!`;
+            const url = `https://t.me/GW_GK?text=${encodeURIComponent(shareMessage)}`;
+            window.open(url, '_blank');
+        }
+        
+        btn.addEventListener('mouseover', moveButton);
+        btn.addEventListener('touchstart', moveButton);
+        telegramButton.addEventListener('click', shareTelegram);
+        
+        // Posisikan tombol awal
+        btn.style.left = '50%';
+        btn.style.top = '50%';
+        btn.style.transform = 'translate(-50%, -50%)';
+    </script>
+
+</body>
+</html>
