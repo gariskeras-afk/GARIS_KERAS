@@ -41,7 +41,7 @@
             width: 100%;
             aspect-ratio: 16 / 9; /* Rasio Video Standar */
             margin-bottom: 20px;
-            display: none; /* Sembunyikan player di awal */
+            display: none; 
             border-radius: 8px;
             overflow: hidden;
         }
@@ -106,7 +106,6 @@
         const questions = [
             {
                 q: "Dengarkan klip ini. Lagu hits pop Indonesia yang rilis 2022 ini berjudul:",
-                // ID Video YouTube (Contoh: klip lagu Sial)
                 youtubeId: "vB8k5tJ8-u0", 
                 options: ["Komang", "Sial", "Tertawan Hati", "Hati-Hati di Jalan"],
                 answer: "Sial",
@@ -115,7 +114,6 @@
             },
             {
                 q: "Ini adalah salah satu 'sound' paling viral di TikTok tahun 2023. Judul lagunya adalah:",
-                // ID Video YouTube (Contoh: klip lagu Rungkad)
                 youtubeId: "W9oXQ4yXw-M", 
                 options: ["Rungkad", "Glimpse of Us", "Asmalibrasi", "Ayam Jago"],
                 answer: "Rungkad",
@@ -124,7 +122,6 @@
             },
             {
                 q: "Lagu dari band rock Indonesia yang viral kembali karena dipakai di film horor:",
-                // ID Video YouTube (Contoh: klip lagu Dulu)
                 youtubeId: "4_8D3i5D0sQ", 
                 options: ["Kisah Klasik", "Dulu", "Bertahan", "Menghapus Jejakmu"],
                 answer: "Dulu",
@@ -133,7 +130,7 @@
             }
         ];
 
-        // Elemen HTML
+        
         const qDisplay = document.getElementById('question-display');
         const optionsContainer = document.getElementById('options-container');
         const resultDisplay = document.getElementById('result-display');
@@ -142,25 +139,26 @@
         const telegramButton = document.getElementById('telegram-share-button');
         const playerContainer = document.getElementById('youtube-player-container');
         
-        // Variabel Game
         let currentQuestionIndex = 0;
         let score = 0;
         let player;
         let stopPlaybackTimeout;
+        let playAgainButton;
 
         // --- Fungsi API YouTube Player ---
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
                 height: '100%',
                 width: '100%',
-                videoId: '', // ID akan dimuat saat game dimulai
+                videoId: '',
                 playerVars: {
                     'playsinline': 1,
-                    'controls': 0, // Sembunyikan kontrol video
-                    'disablekb': 1, // Nonaktifkan kontrol keyboard
-                    'rel': 0, // Jangan tampilkan video terkait
-                    'modestbranding': 1, // Branding YouTube minimal
-                    'autoplay': 0
+                    'controls': 1, // Kita tampilkan kontrol agar pengguna bisa unmute
+                    'disablekb': 1,
+                    'rel': 0, 
+                    'modestbranding': 1,
+                    'autoplay': 1,  // PENTING: Minta autoplay
+                    'mute': 1       // PENTING: Autoplay seringkali hanya diizinkan jika mute
                 },
                 events: {
                     'onReady': onPlayerReady,
@@ -174,33 +172,36 @@
         }
 
         function onPlayerStateChange(event) {
-            // Jika video mulai diputar
             if (event.data === YT.PlayerState.PLAYING) {
                 const q = questions[currentQuestionIndex];
-                // Atur timeout untuk menghentikan pemutaran setelah durasi klip
+                clearTimeout(stopPlaybackTimeout);
+                
                 stopPlaybackTimeout = setTimeout(() => {
                     player.stopVideo();
-                    player.seekTo(q.startTime, true); // Reset ke awal klip untuk putar ulang
+                    player.seekTo(q.startTime, true); 
+                    if(playAgainButton) playAgainButton.textContent = '🔊 Putar Ulang Klip';
                 }, q.duration * 1000); 
             }
         }
         
         // --- Fungsi Kontrol Pemutaran ---
         function playClue() {
-            if (!player || currentQuestionIndex >= questions.length) return;
+            if (!player || currentQuestionIndex >= questions.length || startButton.style.display !== 'none') return;
             
             const q = questions[currentQuestionIndex];
             
-            // Hentikan timeout sebelumnya jika ada
             clearTimeout(stopPlaybackTimeout);
             
-            // Muat video baru (jika ID berbeda) dan putar dari startTime
             if (player.getVideoData().video_id !== q.youtubeId) {
                 player.loadVideoById(q.youtubeId, q.startTime);
             } else {
                 player.seekTo(q.startTime, true);
                 player.playVideo();
             }
+            if(playAgainButton) playAgainButton.textContent = '▶️ Memutar...';
+            
+            // Tambahkan pesan panduan jika player ter-mute
+            resultDisplay.innerHTML = '<span style="color: #f1c40f; font-size: 0.9em;">⚠️ Jika tidak ada suara, klik tombol Mute/Volume di player di atas!</span>';
         }
 
         // --- Fungsi Utama Game ---
@@ -210,8 +211,14 @@
             startButton.style.display = 'none';
             telegramButton.style.display = 'none';
             resultDisplay.textContent = '';
-            playerContainer.style.display = 'block'; // Tampilkan player
-            loadQuestion();
+            playerContainer.style.display = 'block'; 
+            
+            // Muat video pertama untuk inisialisasi
+            const firstQ = questions[0];
+            player.loadVideoById(firstQ.youtubeId, firstQ.startTime);
+            
+            // Berikan waktu sebentar untuk player memuat sebelum memanggil loadQuestion
+            setTimeout(loadQuestion, 500); 
         }
 
         function loadQuestion() {
@@ -225,17 +232,11 @@
             qDisplay.innerHTML = `<strong>Soal ${currentQuestionIndex + 1}:</strong> ${q.q}`;
             optionsContainer.innerHTML = '';
             nextButton.style.display = 'none';
-            resultDisplay.textContent = '';
             
-            // Muat video klip untuk soal ini dan putar
-            if (player.getVideoData().video_id !== q.youtubeId) {
-                 player.loadVideoById(q.youtubeId, q.startTime);
-            } else {
-                player.seekTo(q.startTime, true);
-            }
-            player.pauseVideo();
+            // Load video klip (dan autoplay akan mencoba memutar)
+            player.loadVideoById(q.youtubeId, q.startTime);
             
-            // Tampilkan tombol opsi
+            // Tambahkan tombol opsi
             q.options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
@@ -244,34 +245,29 @@
                 optionsContainer.appendChild(button);
             });
             
-            // Tambahkan tombol play manual
-            const playAgainButton = document.createElement('button');
+            // Tambahkan tombol play manual/ulang
+            playAgainButton = document.createElement('button');
             playAgainButton.textContent = '🔊 Putar Ulang Klip';
-            playAgainButton.id = 'play-again-button';
             playAgainButton.style.cssText = 'padding: 10px 20px; background-color: #1abc9c; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;';
             playAgainButton.addEventListener('click', playClue);
             optionsContainer.insertBefore(playAgainButton, optionsContainer.firstChild);
 
-            // Putar klip otomatis saat soal dimuat
             playClue();
         }
 
         function checkAnswer(clickedButton, selectedOption, correctAnswer) {
-            // Nonaktifkan semua tombol
             Array.from(optionsContainer.children).forEach(btn => btn.disabled = true);
             
-            // Hentikan klip
             clearTimeout(stopPlaybackTimeout);
             player.stopVideo();
             
             if (selectedOption === correctAnswer) {
                 score++;
                 resultDisplay.textContent = '✅ Benar! Anda Peka Musik Viral.';
-                clickedButton.style.backgroundColor = '#1abc9c'; // Hijau benar
+                clickedButton.style.backgroundColor = '#1abc9c';
             } else {
                 resultDisplay.innerHTML = `❌ Salah! Judul yang benar adalah: **${correctAnswer}**`;
-                clickedButton.style.backgroundColor = '#e74c3c'; // Merah salah
-                // Tandai jawaban benar
+                clickedButton.style.backgroundColor = '#e74c3c';
                 Array.from(optionsContainer.children).find(btn => btn.textContent === correctAnswer).style.backgroundColor = '#2ecc71';
             }
             
@@ -284,6 +280,7 @@
             optionsContainer.innerHTML = '';
             nextButton.style.display = 'none';
             playerContainer.style.display = 'none';
+            resultDisplay.textContent = ''; // Kosongkan peringatan volume
 
             let finalStatus = (score === questions.length) ? '🥇 MUSIKOLOG VIRAL SEJATI!' : '🎧 Masih Perlu Banyak Mendengar Lagu Hits.';
             
@@ -304,14 +301,12 @@
             window.open(url, '_blank');
         }
 
-        // Event Listeners
         startButton.addEventListener('click', startGame);
         nextButton.addEventListener('click', () => { currentQuestionIndex++; loadQuestion(); });
         telegramButton.addEventListener('click', shareTelegram);
 
-        // Inisialisasi tampilan awal
-        optionsContainer.innerHTML = '<p style="color:#bdc3c7;">Klik "Mulai Kuis" untuk memulai tantangan tebak lagu ini!</p>';
-        startButton.disabled = true; // Nonaktifkan sampai player YouTube siap
+        optionsContainer.innerHTML = '<p style="color:#bdc3c7;">Player YouTube harus siap sebelum tombol "Mulai Kuis" aktif. Tunggu sebentar...</p>';
+        startButton.disabled = true;
     </script>
 </body>
 </html>
